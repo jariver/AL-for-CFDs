@@ -1,0 +1,6 @@
+//CFD1: (g, e, d) => f
+c1: sp500(a: $a1, b: $b1, c: $c1, d: $d1, e: $e1, f: $f1, g: $g1), sp500(a: $a2, b: $b2, c: $c2, d: $d2, e: $e2, f: $f2, g: $g2), $g1 == $g2, $e1 == $e2, $d1 == $d2, $f1 != $f2 -> #fail.
+//CFD2: (g, f, b) => d
+c2: sp500(a: $a1, b: $b1, c: $c1, d: $d1, e: $e1, f: $f1, g: $g1), sp500(a: $a2, b: $b2, c: $c2, d: $d2, e: $e2, f: $f2, g: $g2), $g1 == $g2, $f1 == $f2, $b1 == $b2, $d1 != $d2 -> #fail.
+//CFD3: (g, f, c) => d
+c3: sp500(a: $a1, b: $b1, c: $c1, d: $d1, e: $e1, f: $f1, g: $g1), sp500(a: $a2, b: $b2, c: $c2, d: $d2, e: $e2, f: $f2, g: $g2), $g1 == $g2, $f1 == $f2, $c1 == $c2, $d1 != $d2 -> #fail.

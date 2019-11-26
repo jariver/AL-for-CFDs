@@ -1,0 +1,6 @@
+//CFD1: (viscera, whole, rings=10) => height
+c1: abalone(sex: $a1, length: $b1, diameter: $c1, height: $d1, whole: $e1, whucked: $f1, viscera: $g1, shell: $h1, rings: $i1), abalone(sex: $a2, length: $b2, diameter: $c2, height: $d2, whole: $e2, whucked: $f2, viscera: $g2, shell: $h2, rings: $i2), $g1 == $g2, $e1 == $e2, $i1 == $i2, $i1 == "10", $d1 != $d2 -> #fail.
+//CFD2: (whucked, whole, height, diameter) => rings
+c2: abalone(sex: $a1, length: $b1, diameter: $c1, height: $d1, whole: $e1, whucked: $f1, viscera: $g1, shell: $h1, rings: $i1), abalone(sex: $a2, length: $b2, diameter: $c2, height: $d2, whole: $e2, whucked: $f2, viscera: $g2, shell: $h2, rings: $i2), $f1 == $f2, $e1 == $e2, $d1 == $d2, $c1 == $c2, $i1 != $i2 -> #fail.
+//CFD3: (shell, whole, length, rings=9) => height
+c3: abalone(sex: $a1, length: $b1, diameter: $c1, height: $d1, whole: $e1, whucked: $f1, viscera: $g1, shell: $h1, rings: $i1), abalone(sex: $a2, length: $b2, diameter: $c2, height: $d2, whole: $e2, whucked: $f2, viscera: $g2, shell: $h2, rings: $i2), $h1 == $h2, $e1 == $e2, $b1 == $b2, $i1 == $i2, $i1 == "9", $d1 != $d2 -> #fail.

@@ -1,0 +1,6 @@
+//CFD1: (season, position, surname, stadium=King_Power_Stadium) => team
+c1: Soccer(name: $a1, surname: $b1, birthyear: $c1, birthplace: $d1, position: $e1, team: $f1, city: $g1, stadium: $h1, season: $i1, manager: $j1), Soccer(name: $a2, surname: $b2, birthyear: $c2, birthplace: $d2, position: $e2, team: $f2, city: $g2, stadium: $h2, season: $i2, manager: $j2), $i1 == $i2, $e1 == $e2, $b1 == $b2, $h1 == $h2, $h1 == "King_Power_Stadium", $f1 != $f2 -> #fail.
+//CFD2: (city, birthplace, season=2013) => position
+c2: Soccer(name: $a1, surname: $b1, birthyear: $c1, birthplace: $d1, position: $e1, team: $f1, city: $g1, stadium: $h1, season: $i1, manager: $j1), Soccer(name: $a2, surname: $b2, birthyear: $c2, birthplace: $d2, position: $e2, team: $f2, city: $g2, stadium: $h2, season: $i2, manager: $j2), $g1 == $g2, $d1 == $d2, $i1 == $i2, $i1 == "2013", $e1 != $e2 -> #fail.
+//CFD3: (position, surname, city=Solna) => season
+c3: Soccer(name: $a1, surname: $b1, birthyear: $c1, birthplace: $d1, position: $e1, team: $f1, city: $g1, stadium: $h1, season: $i1, manager: $j1), Soccer(name: $a2, surname: $b2, birthyear: $c2, birthplace: $d2, position: $e2, team: $f2, city: $g2, stadium: $h2, season: $i2, manager: $j2), $e1 == $e2, $b1 == $b2, $g1 == $g2, $g1 == "Solna", $i1 != $i2 -> #fail.

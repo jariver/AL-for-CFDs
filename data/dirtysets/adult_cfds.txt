@@ -1,0 +1,6 @@
+//CFD1: (maritalstatus=Never-married, race=White, sex=Male, relationship=Own-child, age=18-21) => income=LessThan50K
+c1: adult(age: $a1, workclass: $b1, education: $c1, maritalstatus: $d1, occupation: $e1, relationship: $f1, race: $g1, sex: $h1, hoursperweek: $i1, country: $j1, income: $k1), $d1 == "Never-married", $g1 == "White", $h1 == "Male", $f1 == "Own-child", $a1 == "18-21", $k1 != "LessThan50K" -> #fail.
+//CFD2: (maritalstatus=Never-married, education=HS-grad, age=18-21) => income=LessThan50K
+c2: adult(age: $a1, workclass: $b1, education: $c1, maritalstatus: $d1, occupation: $e1, relationship: $f1, race: $g1, sex: $h1, hoursperweek: $i1, country: $j1, income: $k1), $d1 == "Never-married", $c1 == "HS-grad", $a1 == "18-21", $k1 != "LessThan50K" -> #fail.
+//CFD3: (education=Some-college, relationship=Husband) => sex=Male
+c3: adult(age: $a1, workclass: $b1, education: $c1, maritalstatus: $d1, occupation: $e1, relationship: $f1, race: $g1, sex: $h1, hoursperweek: $i1, country: $j1, income: $k1), $c1 == "Some-college", $f1 == "Husband", $h1 != "Male" -> #fail.
