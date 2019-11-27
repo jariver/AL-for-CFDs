@@ -72,35 +72,35 @@ def compute_freq(tuples):
             dict_freq[key] = dict_freq_dict
     return dict_freq
 
-def compute_predict(dict_freq, delta):
+def compute_predicate(dict_freq, delta):
     r'''
     delta = 2
-    predict can be selected if its frequent >= 2
+    predicate can be selected if its frequent >= 2
     '''
-    dict_predict = dict()
-    dict_predict_re = dict()
+    dict_predicate = dict()
+    dict_predicate_re = dict()
 
     index = 0
     for attr, dict_freq_dict in dict_freq.items():
         for key, value in dict_freq_dict.items():
             if value >= delta:
-                str_predict = str(attr) + '=' + str(key)
-                dict_predict[index] = str_predict
-                dict_predict_re[str_predict] = index
+                str_predicate = str(attr) + '=' + str(key)
+                dict_predicate[index] = str_predicate
+                dict_predicate_re[str_predicate] = index
                 index += 1
-    return dict_predict, dict_predict_re
+    return dict_predicate, dict_predicate_re
 
-def compute_feat_vec(tuples, dict_predict, dict_predict_re):
+def compute_feat_vec(tuples, dict_predicate, dict_predicate_re):
     r'''Compute the feature vector of every tuple and generate the cid.
     '''
     for tup in tuples:
-        for i in dict_predict.keys():
+        for i in dict_predicate.keys():
             tup.feature_vec.append(0)
 
         for attr, value in tup.value_dict.items():
-            str_predict = str(attr) + '=' + str(value)
-            if str_predict in dict_predict_re.keys():
-                tup.feature_vec[dict_predict_re[str_predict]] = 1
+            str_predicate = str(attr) + '=' + str(value)
+            if str_predicate in dict_predicate_re.keys():
+                tup.feature_vec[dict_predicate_re[str_predicate]] = 1
 
     for index, tup in enumerate(tuples):
         tup.cid = index
