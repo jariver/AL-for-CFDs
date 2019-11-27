@@ -1,18 +1,19 @@
 import csv
 from Tuple import *
 
+
 def create_attr_dict(path, file):
-    r'''Create two dictionaries using to mark the index of Attributes.
+    r"""Create two dictionaries using to mark the index of Attributes.
 
     Args:
-        path: Dictionary of the csv file.
-        file: The name of the csv file.
+        path (str): Dictionary of the csv file.
+        file (str): The name of the csv file.
 
     Return:
-        attr_dict: {index: attribute, ...}, e.g.{6: 'ZIP', ...}.
-        attr_dict_re: {attribute: index, ...}, e.g.{'ZIP': 6, ...}.
+        attr_dict (dict): {index: attribute, ...}, e.g.{6: 'ZIP', ...}.
+        attr_dict_re (dict): {attribute: index, ...}, e.g.{'ZIP': 6, ...}.
 
-    '''
+    """
     with open(path+file, encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
         attr_name = next(reader)
@@ -20,17 +21,18 @@ def create_attr_dict(path, file):
         attr_dict_re = {attr: i for i, attr in enumerate(attr_name)}
     return attr_dict, attr_dict_re
 
+
 def create_tuples(path, file, attr_dict):
-    r'''Create a list of Tuple Class.
+    r"""Create a list of Tuple Class.
 
     Args:
-        path: Dictionary of the csv file.
-        file: The name of the csv file.
-        attr_dict: {index: attribute, ...}, e.g.{6: 'ZIP', ...}.
+        path (str): Dictionary of the csv file.
+        file (str): The name of the csv file.
+        attr_dict (dict): {index: attribute, ...}, e.g.{6: 'ZIP', ...}.
 
     Return:
-        tuples: A list of all instances of Tuple Class, which contains all tuples in whole csv file.
-    '''
+        tuples (list): A list of all instances of Tuple Class, which contains all tuples in whole csv file.
+    """
     tuples = list()
     with open(path+file, encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
@@ -40,6 +42,7 @@ def create_tuples(path, file, attr_dict):
             tuples.append(tup)
     return tuples
 
+
 def write_data(out_path, out_file, tuples):
     with open(out_path+out_file, mode='w', encoding='utf-8') as writer:
         for tuple in tuples:
@@ -47,15 +50,16 @@ def write_data(out_path, out_file, tuples):
                 writer.write(value + ' ')
             writer.write('\n')
 
+
 def compute_freq(tuples):
-    r'''Compute the frequency of all values.
+    r"""Compute the frequency of all values.
 
     Args:
         tuples: A list of all instances of Tuple Class, which contains all tuples in whole csv file.
 
     Return:
         dict_freq: {'ZIP': {'07974': 4, '07975': 5, ...}, 'CT': {'MH': 2, ...}, ...}
-    '''
+    """
     dict_freq = dict()
 
     for tuple in tuples:
@@ -72,11 +76,12 @@ def compute_freq(tuples):
             dict_freq[key] = dict_freq_dict
     return dict_freq
 
+
 def compute_predicate(dict_freq, delta):
-    r'''
+    r"""
     delta = 2
     predicate can be selected if its frequent >= 2
-    '''
+    """
     dict_predicate = dict()
     dict_predicate_re = dict()
 
@@ -90,9 +95,10 @@ def compute_predicate(dict_freq, delta):
                 index += 1
     return dict_predicate, dict_predicate_re
 
-def compute_feat_vec(tuples, dict_predicate, dict_predicate_re):
-    r'''Compute the feature vector of every tuple and generate the cid.
-    '''
+
+def compute_feature_vector(tuples, dict_predicate, dict_predicate_re):
+    r"""Compute the feature vector of every tuple and generate the cid.
+    """
     for tup in tuples:
         for i in dict_predicate.keys():
             tup.feature_vec.append(0)
@@ -104,4 +110,40 @@ def compute_feat_vec(tuples, dict_predicate, dict_predicate_re):
 
     for index, tup in enumerate(tuples):
         tup.cid = index
+    return tuples
+
+
+def compute_confidence(tuples):
+    r"""Compute the confidence of a tuple. confidence = (#predicates in tuple) / (#all predicates)
+
+    Args:
+        tuples (list): A list of all instances of Tuple Class, which contains all tuples in whole csv file.
+
+    Return:
+        confidence (): the confident value of this tuple instance
+    """
+    for tup in tuples:
+        tup_predicate_count = tup.feature_vec.count(1)
+        all_predicate_count = len(tup.feature_vec)
+        tup.confidence = tup_predicate_count / all_predicate_count
+    return tuples
+
+
+def mark_label(true_str, false_str, tuples):
+    r"""
+
+    Args:
+        true_str (str): A cid string user input. These tuples violate the CFDs user wants to express, e.g.'0,1,7'
+        false_str (str): A cid string user input. These tuples don't violate the CFDs user wants to express, e.g.'3'
+        tuples (list): A list of all instances of Tuple Class, which contains all tuples in whole csv file.
+
+    Return:
+    """
+    true_cid = list(map(int, true_str.split(',')))
+    for cid in true_cid:
+        tuples[cid].label = 1
+
+    false_cid = list(map(int, false_str.split('.')))
+    for cid in false_cid:
+        tuples[cid].label = 0
     return tuples
