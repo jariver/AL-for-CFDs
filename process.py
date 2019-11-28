@@ -153,17 +153,20 @@ def tup_sort(tuples):
     r"""Sort in descending order of confidence in Tuple instance.
 
     Args:
-        tuples:
+        tuples (list): A list of all instances of Tuple Class, which contains all tuples in whole csv file.
     """
     tuples.sort(key=operator.attrgetter('confidence'), reverse=True)
 
 
 def select_tuple(tuples, k):
-    r"""
+    r"""select the top-k confidence tuples into dataset_list
 
     Args:
-        tuples:
-        k:
+        tuples (list): A list of all instances of Tuple Class, which contains all tuples in whole csv file.
+        k (int): a argument for selecting top-k confidence tuples.
+
+    Return:
+        dataset_list (DataSet): A list of DataSet instances, which be used as training set.
     """
     for i in range(k):
         print(tuples[i].cid, tuples[i].value_dict)
@@ -186,3 +189,81 @@ def select_tuple(tuples, k):
         dataset_list.append(dataset)
     return dataset_list
 
+
+def generate_all_predicate(dict_predicate_re):
+    r"""
+
+    Args:
+        dict_predicate_re:
+
+    Return:
+    """
+    all_predicate_set = set()
+    for predicate in dict_predicate_re.keys():
+        all_predicate_set.add(predicate)
+    return all_predicate_set
+
+
+def generate_tup_predicate(dataset_list, dict_predicate, all_predicate_set):
+    r"""
+
+    Args:
+        dataset_list:
+        dict_predicate:
+        all_predicate_set:
+
+    Return:
+    """
+    predicate_list = list()
+    predicate_list_minus = list()
+    for dataset in dataset_list:
+        tup_predicate_set = set()
+
+        if dataset.label == 1:
+            for index, value in enumerate(dataset.feature_vec):
+                if value == 1:
+                    tup_predicate_set.add(dict_predicate[index])
+            predicate_list.append(tup_predicate_set)
+            tup_predicate_set_minus = all_predicate_set - tup_predicate_set
+            predicate_list_minus.append(tup_predicate_set_minus)
+    return predicate_list, predicate_list_minus
+
+
+def generate_R_CFDs(dataset_list, dict_predicate, predicate_list, predicate_list_minus, all_predicate_set):
+    r"""
+
+    Args:
+        dataset_list:
+        dict_predicate:
+        predicate_list:
+        predicate_list_minus:
+        all_predicate_set:
+
+    Return:
+    """
+    R_CFDs = list()
+    for dataset in dataset_list:
+        tup_predicate_set = set()
+
+        if dataset.label == 1:
+            for index, value in enumerate(dataset.feature_vec):
+                if value == 1:
+                    tup_predicate_set.add(dict_predicate[index])
+            predicate_list.append(tup_predicate_set)
+            tup_predicate_set_minus = all_predicate_set - tup_predicate_set
+            predicate_list_minus.append(tup_predicate_set_minus)
+
+    for predicate, predicate_minus in zip(predicate_list, predicate_list_minus):
+        predicate = list(predicate)
+        predicate_size = len(predicate)
+        for rhs in predicate_minus:
+            for i in range(1, 2 ** predicate_size):
+                CFD = dict()
+                LHS = set()
+                for j in range(predicate_size):
+                    if (i >> j) % 2 == 1:
+                        LHS.add(predicate[j])
+                CFD['LHS'] = LHS
+                CFD['RHS'] = rhs
+                R_CFDs.append(CFD)
+    return R_CFDs
