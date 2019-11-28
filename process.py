@@ -1,5 +1,7 @@
 import csv
+import operator
 from Tuple import *
+from DataSet import *
 
 
 def create_attr_dict(path, file):
@@ -110,7 +112,6 @@ def compute_feature_vector(tuples, dict_predicate, dict_predicate_re):
 
     for index, tup in enumerate(tuples):
         tup.cid = index
-    return tuples
 
 
 def compute_confidence(tuples):
@@ -118,15 +119,11 @@ def compute_confidence(tuples):
 
     Args:
         tuples (list): A list of all instances of Tuple Class, which contains all tuples in whole csv file.
-
-    Return:
-        confidence (): the confident value of this tuple instance
     """
     for tup in tuples:
         tup_predicate_count = tup.feature_vec.count(1)
         all_predicate_count = len(tup.feature_vec)
         tup.confidence = tup_predicate_count / all_predicate_count
-    return tuples
 
 
 def mark_label(true_str, false_str, tuples):
@@ -136,14 +133,56 @@ def mark_label(true_str, false_str, tuples):
         true_str (str): A cid string user input. These tuples violate the CFDs user wants to express, e.g.'0,1,7'
         false_str (str): A cid string user input. These tuples don't violate the CFDs user wants to express, e.g.'3'
         tuples (list): A list of all instances of Tuple Class, which contains all tuples in whole csv file.
-
-    Return:
     """
     true_cid = list(map(int, true_str.split(',')))
     for cid in true_cid:
-        tuples[cid].label = 1
+        for tup in tuples:
+            if tup.cid == cid:
+                tup.label = 1
+                break
 
     false_cid = list(map(int, false_str.split('.')))
     for cid in false_cid:
-        tuples[cid].label = 0
-    return tuples
+        for tup in tuples:
+            if tup.cid == cid:
+                tup.label = 0
+                break
+
+
+def tup_sort(tuples):
+    r"""Sort in descending order of confidence in Tuple instance.
+
+    Args:
+        tuples:
+    """
+    tuples.sort(key=operator.attrgetter('confidence'), reverse=True)
+
+
+def select_tuple(tuples, k):
+    r"""
+
+    Args:
+        tuples:
+        k:
+    """
+    for i in range(k):
+        print(tuples[i].cid, tuples[i].value_dict)
+
+    # true_str = input("Which tuples violate the CFDs you want to express? "
+    #                    "(Please input the cid of tuples, e.g. 2,3,4,5) >>> ")
+    # false_str = input("Which tuple don't violate the CFDs you want to express? "
+    #                    "(Please input the cid of tuples, e.g. 2,3,4,5) >>> ")
+    true_str = '0,1'
+    false_str = '3'
+
+    mark_label(true_str, false_str, tuples)
+
+    dataset_list = list()
+    for i in range(k):
+        dataset = DataSet()
+        dataset.cid = tuples[i].cid
+        dataset.feature_vec = tuples[i].feature_vec
+        dataset.label = tuples[i].label
+        dataset_list.append(dataset)
+    return dataset_list
+
