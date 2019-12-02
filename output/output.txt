@@ -1,6 +1,25 @@
-(AC=908) => CC=44
-(AC=908) => PN=2222222
-(CC=01) => AC=131
-(ZIP=07974) => AC=131
-(ZIP=07974) => CC=44
-(ZIP=07974) => PN=2222222
+(AC=131) => CC=44
+(AC=131) => CT=EDI
+(AC=131) => STR=High_St.
+(AC=131) => ZIP=EH4_1DT
+(AC=908) => CT=MH
+(CC=01, ZIP=07974) => AC=908
+(CC=44, CT=EDI) => AC=131
+(CT=EDI) => CC=44
+(CT=EDI) => STR=High_St.
+(CT=EDI) => ZIP=EH4_1DT
+(CT=MH) => AC=908
+(CT=NYC) => CC=01
+(NM=Ian) => CC=44
+(PN=4444444) => CC=44
+(PN=4444444) => NM=Ian
+(STR=High_St.) => AC=131
+(STR=High_St.) => CC=44
+(STR=High_St.) => CT=EDI
+(STR=High_St.) => ZIP=EH4_1DT
+(ZIP=01202) => PN=2222222
+(ZIP=07974) => CC=01
+(ZIP=EH4_1DT) => AC=131
+(ZIP=EH4_1DT) => CC=44
+(ZIP=EH4_1DT) => CT=EDI
+(ZIP=EH4_1DT) => STR=High_St.

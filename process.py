@@ -49,10 +49,11 @@ def compute_freq(tuples):
     r"""Compute the frequency of all values.
 
     Args:
-        tuples: A list of all instances of Tuple Class, which contains all tuples in whole csv file.
+        tuples (list): A list of all instances of Tuple Class, which contains all tuples in whole csv file.
 
     Return:
-        dict_freq: {'ZIP': {'07974': 4, '07975': 5, ...}, 'CT': {'MH': 2, ...}, ...}
+        dict_freq (dict): The frequency of every value in every attribute.
+                    e.g.{'ZIP': {'07974': 4, '07975': 5, ...}, 'CT': {'MH': 2, ...}, ...}
     """
     dict_freq = dict()
 
@@ -72,9 +73,16 @@ def compute_freq(tuples):
 
 
 def compute_predicate(dict_freq, delta):
-    r"""
-    delta = 2
-    predicate can be selected if its frequent >= 2
+    r"""If delta = 2, it means that predicate can be selected if its frequency >= 2
+
+    Args:
+        dict_freq (dict): The frequency of every value in every attribute.
+                    e.g.{'ZIP': {'07974': 4, '07975': 5, ...}, 'CT': {'MH': 2, ...}, ...}
+        delta (int): The argument user can set to define the frequency.
+
+    Return:
+        dict_predicate (dict): The selected predicates. e.g.{0: 'CC=01', 1: 'CC=44', 2: 'AC=908', ...}
+        dict_predicate_re (dict): The selected predicates. e.g.{'CC=01': 0, 'CC=44': 1, 'AC=908': 2, ...}
     """
     dict_predicate = dict()
     dict_predicate_re = dict()
@@ -92,6 +100,11 @@ def compute_predicate(dict_freq, delta):
 
 def compute_feature_vector(tuples, dict_predicate, dict_predicate_re):
     r"""Compute the feature vector of every tuple and generate the cid.
+
+    Args:
+        tuples (list): A list of all instances of Tuple Class, which contains all tuples in whole csv file.
+        dict_predicate (dict): The selected predicates. e.g.{0: 'CC=01', 1: 'CC=44', 2: 'AC=908', ...}
+        dict_predicate_re (dict): The selected predicates. e.g.{'CC=01': 0, 'CC=44': 1, 'AC=908': 2, ...}
     """
     for tup in tuples:
         for i in dict_predicate.keys():
@@ -151,11 +164,11 @@ def tup_sort(tuples):
 
 
 def select_tuple(tuples, k):
-    r"""select the top-k confidence tuples into dataset_list
+    r"""Select the top-k confidence tuples into dataset_list
 
     Args:
         tuples (list): A list of all instances of Tuple Class, which contains all tuples in whole csv file.
-        k (int): a argument for selecting top-k confidence tuples.
+        k (int): A argument for selecting top-k confidence tuples.
 
     Return:
         dataset_list (DataSet): A list of DataSet instances, which be used as training set.
@@ -167,8 +180,8 @@ def select_tuple(tuples, k):
     #                    "(Please input the cid of tuples, e.g. 2,3,4,5) >>> ")
     # false_str = input("Which tuple don't violate the CFDs you want to express? "
     #                    "(Please input the cid of tuples, e.g. 2,3,4,5) >>> ")
-    true_str = '0,1'
-    false_str = '2,3,4,7'
+    true_str = '0,1,7'
+    false_str = '2,3,4,5,6'
 
     mark_label(true_str, false_str, tuples)
 
@@ -186,9 +199,10 @@ def generate_all_predicate(dict_predicate_re):
     r"""
 
     Args:
-        dict_predicate_re:
+        dict_predicate_re (dict): The selected predicates. e.g.{'CC=01': 0, 'CC=44': 1, 'AC=908': 2, ...}
 
     Return:
+        all_predicate_set (set):
     """
     all_predicate_set = set()
     for predicate in dict_predicate_re.keys():
@@ -197,14 +211,17 @@ def generate_all_predicate(dict_predicate_re):
 
 
 def generate_tup_predicate(dataset_list, dict_predicate, all_predicate_set):
-    r"""
+    r"""If label = 1, means violate R_CFDs. If label = 0, it means the tuple is correct and
 
     Args:
-        dataset_list:
-        dict_predicate:
-        all_predicate_set:
+        dataset_list (DataSet): A list of DataSet instances, which be used as training set.
+        dict_predicate (dict): The selected predicates. e.g.{0: 'CC=01', 1: 'CC=44', 2: 'AC=908', ...}
+        all_predicate_set (set):
 
     Return:
+        predicate_list (list):
+        predicate_list_minus (list):
+        predicate_list_0 (list):
     """
     predicate_list = list()
     predicate_list_minus = list()
@@ -231,14 +248,15 @@ def generate_tup_predicate(dataset_list, dict_predicate, all_predicate_set):
     return predicate_list, predicate_list_minus, predicate_list_0
 
 
-def generate_R_CFDs(predicate_list, predicate_list_minus):
+def generate_R_CFDs(predicate_list, predicate_list_minus, predicate_list_0):
     r"""
 
     Args:
-        predicate_list:
-        predicate_list_minus:
+        predicate_list (list):
+        predicate_list_minus (list):
 
     Return:
+        R_CFDs (list):
     """
     R_CFDs = list()
 
@@ -255,6 +273,19 @@ def generate_R_CFDs(predicate_list, predicate_list_minus):
                 CFD['LHS'] = LHS
                 CFD['RHS'] = rhs
                 R_CFDs.append(CFD)
+    for predicate in predicate_list_0:
+        predicate = list(predicate)
+        predicate_size = len(predicate)
+        for rhs in predicate:
+            for i in range(1, 2 ** predicate_size):
+                CFD = dict()
+                LHS = list()
+                for j in range(predicate_size):
+                    if(i >> j) % 2 == 1:
+                        LHS.append(predicate[j])
+                CFD['LHS'] = LHS
+                CFD['RHS'] = rhs
+                R_CFDs.append(CFD)
     return R_CFDs
 
 
@@ -262,8 +293,8 @@ def remove_from_R_CFDs(R_CFDs, predicate_list_0):
     r"""
 
     Args:
-        R_CFDs:
-        predicate_list_0:
+        R_CFDs (list):
+        predicate_list_0 (list):
 
     Return:
 
@@ -271,15 +302,19 @@ def remove_from_R_CFDs(R_CFDs, predicate_list_0):
     for CFD in reversed(R_CFDs):
         for predicate in predicate_list_0:
             if all(pre in predicate for pre in CFD['LHS']):
-                if CFD['RHS'] in predicate:
-                    R_CFDs.remove(CFD)
+                if CFD['RHS'] not in predicate:
+                    try:
+                        R_CFDs.remove(CFD)
+                    except ValueError:
+                        # why can it come in?
+                        pass
 
 
-def clean_from_R_CFDs(R_CFDs):
+def clean_from_R_CFDs(R_CFDs, tuples, delta):
     r"""
 
     Args:
-        R_CFDs:
+        R_CFDs (list):
     """
     R_CFDs.sort(key=lambda e: (e['RHS'], e['LHS']), reverse=True)
 
@@ -300,6 +335,24 @@ def clean_from_R_CFDs(R_CFDs):
                 R_CFDs.remove(CFD)
                 break
             rhs_dict[rhs].add(pre)
+
+    for CFD in reversed(R_CFDs):
+        score_count = 0
+        for tup in tuples:
+            not_match = 0
+            rhs = list(map(str, CFD['RHS'].split('=')))
+            if tup.value_dict[rhs[0]] != rhs[1]:
+                not_match = 1
+            for pre in CFD['LHS']:
+                lhs = list(map(str, pre.split('=')))
+                if tup.value_dict[lhs[0]] != lhs[1]:
+                    not_match = 1
+                    break
+            if not_match == 0:
+                score_count += 1
+        if score_count < delta:
+            R_CFDs.remove(CFD)
+
     R_CFDs.sort(key=lambda e: (e['LHS'], e['RHS']))
 
 
@@ -307,9 +360,9 @@ def output(R_CFDs, out_path, out_file):
     r"""
 
     Args:
-        R_CFDs:
-        out_path:
-        out_file:
+        R_CFDs (list):
+        out_path (str):
+        out_file (str):
     """
     with open(out_path + out_file, mode='w', encoding='utf-8') as writer:
         for CFD in R_CFDs:
